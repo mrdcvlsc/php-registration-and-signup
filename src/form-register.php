@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+// If the user is logged in don't allow new account registration
+if (isset($_SESSION['loggedin'])) {
+	exit('logout first to register a new account');
+}
+?>
+
 <!DOCTYPE html>
 <html>
 	<head>

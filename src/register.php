@@ -1,4 +1,17 @@
 <?php
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST")
+{
+    header('Location: form-register.php');
+	exit;
+}
+
+// If the user is logged in don't allow new account registration
+if (isset($_SESSION['loggedin'])) {
+	exit('logout first to register a new account');
+}
+
 
 $DATABASE_HOST = getenv("DATABASE_HOST");
 $DATABASE_USER = getenv("DATABASE_USER");
