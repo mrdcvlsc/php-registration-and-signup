@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+// check if the file was accessed from a post request
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header('Location: form-register.php');
 	exit;
 }
@@ -32,6 +32,7 @@ if (!isset($_POST['username'], $_POST['password'], $_POST['email'])) {
 	// Could not get the data that should have been sent.
 	exit('Please complete the registration form!');
 }
+
 // Make sure the submitted registration values are not empty.
 if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email'])) {
 	// One or more values are empty.
@@ -72,9 +73,28 @@ if ($stmt = $con->prepare('SELECT id, password FROM accounts WHERE username = ?'
 
         // Username doesn't exists, insert new account
         if ($stmt = $con->prepare('INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)')) {
+            
             // We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt->bind_param('sss', $_POST['username'], $password, $_POST['email']);
+            $password = password_hash(
+                htmlspecialchars($_POST['password']),
+                PASSWORD_DEFAULT
+            );
+            
+            $stmt->bind_param(
+                // i	corresponding variable has type int
+                // d	corresponding variable has type float
+                // s	corresponding variable has type string
+                // b	corresponding variable is a blob and will be sent in packets
+                
+                // if there are multiple arguments to be binded we can do something like 'ssid'
+                // each character coresponds to the argument types in the specified order.
+                'sss',
+                
+                htmlspecialchars($_POST['username']),
+                $password,
+                htmlspecialchars($_POST['email'])
+            );
+
             $stmt->execute();
             echo 'You have successfully registered! You can now login!';
         } else {
